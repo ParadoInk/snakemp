@@ -1,0 +1,14 @@
+{
+  "name": "snakemp",
+  "version": "1.0.0",
+  "description": "snake multiplayer game",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "David Little",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0"
+  }
+}
