@@ -3,6 +3,7 @@ let data;
 let tick = 0;
 
 let player;
+let players = {};
 let apple = [-1, -1];
 const tileSize = 10;
 
@@ -49,9 +50,9 @@ function updateData(){
 function drawPlayers(){
     fill([255, 0, 0]);
     rect(apple[0] * tileSize, apple[1] * tileSize, tileSize, tileSize);
-    players.forEach(function(p){
-        fill(p.color);
-        p.pieces.forEach(function(piece){
+    Object.keys(players).forEach(function(key){
+        fill(players[key].color);
+        players[key].pieces.forEach(function(piece){
             rect(piece[0] * tileSize, piece[1] * tileSize, tileSize, tileSize);
         });
     })
@@ -99,8 +100,8 @@ class Player {
         if(this.pos[0] < 0 || this.pos[0] > 63 || this.pos[1] < 0 || this.pos[1] > 47 ){
             this.die();
         }
-        players.forEach(function(p){
-            p.pieces.forEach(function(piece){
+        Object.keys(players).forEach(function(key){
+            players[key].pieces.forEach(function(piece){
                 if(player.pos[0] == piece[0] && player.pos[1] == piece[1]){
                     player.die();
                 }
@@ -121,5 +122,8 @@ class Player {
 
     die(){
         this.dead = true;
+        setTimeout(function(){
+            socket.emit('die', 0);
+        })
     }
 }
