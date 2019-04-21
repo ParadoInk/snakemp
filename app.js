@@ -22,7 +22,10 @@ io.on('connection', function(socket){
     socket.emit('connectdata', game.players[pnum].data);
     socket.on('updatereply', function(_data){
         game.players[pnum].updatePieces(_data["pieces"]);
-    })
+    });
+    socket.on('spawnapple', function(_data){
+        game.spawnApple();
+    });
 
 });
 
@@ -61,7 +64,7 @@ class Game {
             if(game != 0){
                 game.update();
             }
-        }, 1000 / 3);
+        }, 1000 / 10);
     }
     update(){
         if(this.players.length == 0){
@@ -72,6 +75,7 @@ class Game {
             "players": this.players
         })
     }
+
 
     spawnApple(){
         this.apple = [Math.floor(Math.random() * 64), Math.floor(Math.random() * 48)];

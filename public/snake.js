@@ -3,7 +3,7 @@ let data;
 let tick = 0;
 
 let player;
-let apple;
+let apple = [-1, -1];
 const tileSize = 10;
 
 function setup(){
@@ -15,12 +15,15 @@ function setup(){
 
 function draw(){
     background(0);
-    updatePlayer();
+    if(!player.dead){
+        updatePlayer();
+    }
     let reply = [[player.pos[0], player.pos[1]]];
     socket.emit('updatereply', {
         "pieces": reply.concat(player.tail)
     });
     updateData();
+    player.collide();
     drawPlayers();
 }
 
@@ -76,6 +79,7 @@ class Player {
         this.length = 3;
         this.dir = RIGHT;
         this.color = [0, 0, 0];
+        this.dead = false;
     }
     update(){
         this.tail.push([this.pos[0], this.pos[1]]);
@@ -87,6 +91,22 @@ class Player {
     changeDir(_dir){
         this.dir = _dir;
     }
+    collide(){
+        if(apple[0] == this.pos[0] && apple[1] == this.pos[1]){
+            this.length += lengthIncrease;
+            socket.emit('spawnapple', 0);
+        }
+        if(this.pos[0] < 0 || this.pos[0] > 63 || this.pos[1] < 0 || this.pos[1] > 47 ){
+            this.die();
+        }
+        players.forEach(function(p){
+            p.pieces.forEach(function(piece){
+                if(player.pos[0] == piece[0] && player.pos[1] == piece[1]){
+                    player.die();
+                }
+            })
+        })
+    }
     move(){
         if(this.dir == RIGHT){
             this.pos[0]++;
@@ -97,5 +117,9 @@ class Player {
         } else if(this.dir == DOWN){
             this.pos[1]++;
         }
+    }
+
+    die(){
+        this.dead = true;
     }
 }
