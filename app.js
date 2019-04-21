@@ -4,6 +4,8 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const path = require('path');
 let game = 0;
+let dropped = {};
+const timeout = 100;
 
 app.use(express.static(__dirname + '/public'));
 
@@ -13,6 +15,7 @@ app.get('/', function(req, res){
 
 
 io.on('connection', function(socket){
+    dropped[socket.id] = 0;
     let dead = false;
     console.log("user connected " + socket.id);
     if(game == 0){
@@ -23,6 +26,7 @@ io.on('connection', function(socket){
     socket.on('updatereply', function(_data){
         if(!dead){
             game.players[socket.id].updatePieces(_data["pieces"]);
+            dropped[socket.id] = 0;
         }
     });
     socket.on('spawnapple', function(_data){
@@ -101,7 +105,16 @@ class Game {
         io.emit('update', {
             "apple": this.apple,
             "players": this.players
-        })
+        });
+        Object.keys(dropped).forEach(function(key){
+            dropped[key]++;
+            if(dropped[key] > timeout){
+                if(game != 0){
+                    delete game.players[key];
+                    delete dropped[key];
+                }
+            }
+        });
     }
 
 
