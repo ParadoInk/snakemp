@@ -2,7 +2,7 @@ let socket = io();
 let data;
 let tick = 0;
 
-let player;
+let player, cnv;
 let players = {};
 let apple = [-1, -1];
 const tileSize = 10;
@@ -10,8 +10,19 @@ const tileSize = 10;
 function setup(){
     noLoop();
     blendMode(REPLACE);
-    createCanvas(640, 480);
+    cnv = createCanvas(640, 480);
+    centerCanvas();
     player = new Player();
+}
+
+function centerCanvas(){
+    let x = (windowWidth - width) / 2;
+    let y = 2 * (windowHeight - height) / 5;
+    cnv.position(x, y);
+}
+
+function windowResized(){
+    centerCanvas();
 }
 
 function draw(){
@@ -79,6 +90,7 @@ class Player {
         this.tail = [];
         this.length = 3;
         this.dir = RIGHT;
+        this.nextDir = RIGHT;
         this.color = [0, 0, 0];
         this.dead = false;
     }
@@ -90,7 +102,10 @@ class Player {
         }
     }
     changeDir(_dir){
-        this.dir = _dir;
+        if(this.dir != _dir - 2 && this.dir != _dir + 2){
+            this.nextDir = _dir;
+        }
+
     }
     collide(){
         if(apple[0] == this.pos[0] && apple[1] == this.pos[1]){
@@ -109,6 +124,7 @@ class Player {
         })
     }
     move(){
+        this.dir = this.nextDir;
         if(this.dir == RIGHT){
             this.pos[0]++;
         } else if(this.dir == LEFT){
