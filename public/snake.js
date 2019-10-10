@@ -3,6 +3,7 @@ let cnv, names, scores;
 let apple, players;
 const tileSize = 10;
 let gameState;
+let color = "#666666", party = "I";
 
 function setup(){
     blendMode(REPLACE);
@@ -86,7 +87,8 @@ function play(){
     gameState = "ingame";
     document.getElementById("menu").style.display = 'none';
     socket.emit('newplayer', {
-        "name": document.getElementById("usernameinpt").value
+        "name": document.getElementById("usernameinpt").value + " (" + party + ")",
+        "color": color
     });
 }
 
@@ -128,5 +130,28 @@ function keyPressed(){
         } else if(keyCode == 65){
             changeDir(LEFT);
         }
+    }
+}
+
+function buttoncolor(c){
+    if(c == 'soc'){
+        color = "#490000";
+        party = "S"
+    }
+    if(c == 'dem'){
+        color = "#0000ff";
+        party = "D"
+    }
+    if(c == 'bmp'){
+        color = "#005100";
+        party = "B"
+    }
+    if(c == 'rep'){
+        color = "#ff0000";
+        party = "R"
+    }
+    if(c == 'lib'){
+        color = "#fff700";
+        party = "L"
     }
 }
